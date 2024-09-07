@@ -10,20 +10,26 @@ class NewExpense extends StatefulWidget {
 }
 
 class _NewExpenseState extends State<NewExpense> {
-  var _enteredTitle = '';
+  final _titleController = TextEditingController();
+  final _amountController = TextEditingController();
 
-  void _saveTitleInput(String inputValue) {
-    _enteredTitle = inputValue;
+  @override
+  void dispose() {
+    // must be remove when removed the widget
+    _titleController.dispose();
+    _amountController.dispose();
+    super.dispose();
   }
 
   @override
-  Widget build(Object context) {
+  // Widget build(Object context) {
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           TextField(
-            onChanged: _saveTitleInput,
+            controller: _titleController,
             maxLength: 50,
             decoration: const InputDecoration(
               label: Text('Title'),
@@ -31,9 +37,45 @@ class _NewExpenseState extends State<NewExpense> {
           ),
           Row(
             children: [
+              Expanded(
+                child: TextField(
+                  controller: _amountController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    prefixText: '\$ ',
+                    label: Text('Amount'),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('Selected Date'),
+                    IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.calendar_month))
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Cancel'),
+              ),
               ElevatedButton(
                 onPressed: () {
-                  print(_enteredTitle);
+                  print(_titleController.text);
+                  print(_amountController.text);
                 },
                 child: const Text('Save Expense'),
               )
