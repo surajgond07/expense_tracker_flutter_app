@@ -14,6 +14,7 @@ class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
+  Category _selectedCategory = Category.leisure;
 
   void _presentDatePicker() async {
     final now = DateTime.now();
@@ -24,10 +25,43 @@ class _NewExpenseState extends State<NewExpense> {
         firstDate: firstDate,
         lastDate: now);
     // this line only executed once the value is available
+    // ignore: avoid_print
     print(pickedDate);
     setState(() {
       _selectedDate = pickedDate;
     });
+  }
+
+  void _submitExpenseData() {
+    // double.tryParse() built-in method in Dart, takes Strings a an input and return Double if able to convert or if not then return null
+    // for exmp. tryParse('Hello') => null, tryParse('1.12') => 1.12
+    final enteredAmount = double.tryParse(_amountController.text);
+    // Comparison amount booleean value to to check both null or less than 0
+    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+    // trim() built-in method simply remove white space at the begining or end, trim can be call on strings
+    // isEmpty is a buit-in property, isEmpty call as List of Strings
+    if (_titleController.text.trim().isEmpty ||
+        amountIsInvalid ||
+        _selectedDate == null) {
+      // show error message
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Invalid input'),
+          content: const Text(
+              'Please make sure a valid title, amount, date and category was entered...'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('Okay'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
   }
 
   @override
@@ -83,8 +117,32 @@ class _NewExpenseState extends State<NewExpense> {
               ),
             ],
           ),
+          const SizedBox(
+            height: 16,
+          ),
           Row(
             children: [
+              DropdownButton(
+                  value: _selectedCategory,
+                  items: Category.values
+                      .map(
+                        (category) => DropdownMenuItem(
+                          value: category,
+                          child: Text(
+                            category.name.toUpperCase(),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value == null) {
+                      return;
+                    }
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  }),
+              const Spacer(),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -93,8 +151,7 @@ class _NewExpenseState extends State<NewExpense> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  print(_titleController.text);
-                  print(_amountController.text);
+                  _submitExpenseData();
                 },
                 child: const Text('Save Expense'),
               )
