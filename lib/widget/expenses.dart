@@ -43,12 +43,26 @@ class _ExpensesState extends State<Expenses> {
     });
   }
 
-  //  remove expense method while the swipe data from Dismissible() widget
-
+  //  remove expense method using swipe data from Dismissible() widget
   void _removeExpense(Expense expense) {
+    final expenseIndex = _registeredExpenses.indexOf(expense);
     setState(() {
       _registeredExpenses.remove(expense);
     });
+    ScaffoldMessenger.of(context)
+        .clearSnackBars(); // remove any message might still have on the screen
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: const Duration(seconds: 3),
+      content: const Text('Expense delted.'),
+      action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() {
+              //  getting back delted item by .inset(index, expense)
+              _registeredExpenses.insert(expenseIndex, expense);
+            });
+          }),
+    ));
   }
 
   @override
