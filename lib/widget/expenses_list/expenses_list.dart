@@ -18,6 +18,13 @@ class ExpensesList extends StatelessWidget {
         // creating key for unique Cally identify the value to remove data from swipe
         key: ValueKey(expenses[index]),
         // onDismiss want function as value
+        background: Container(
+          color: Theme.of(context).colorScheme.error.withOpacity(0.75),
+          margin: EdgeInsets.symmetric(
+            // bring Card Theme margin here to apply
+            horizontal: Theme.of(context).cardTheme.margin!.horizontal,
+          ),
+        ),
         onDismissed: (direction) {
           onRemoveExpense(expenses[index]);
         },
