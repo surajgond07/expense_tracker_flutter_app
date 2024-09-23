@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:expense_tracker_app/model/expense.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class NewExpense extends StatefulWidget {
@@ -34,19 +37,25 @@ class _NewExpenseState extends State<NewExpense> {
     });
   }
 
-  void _submitExpenseData() {
-    // double.tryParse() built-in method in Dart, takes Strings a an input and return Double if able to convert or if not then return null
-// for exmp. tryParse('Hello') => null, tryParse('1.12') => 1.12
-    final enteredAmount = double.tryParse(_amountController
-        .text); // tryParse('Hello') => null, tryParse('1.12') => 1.12
-    // Comparison amount booleean value to to check both null or less than 0
-    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
-    // trim() built-in method simply remove white space at the begining or end, trim can be call on strings
-    // isEmpty is a buit-in property, isEmpty call as List of Strings
-
-    if (_titleController.text.trim().isEmpty ||
-        amountIsInvalid ||
-        _selectedDate == null) {
+  void _showDialog() {
+    if (Platform.isIOS) {
+      showCupertinoDialog(
+          context: context,
+          builder: (ctx) => CupertinoAlertDialog(
+                title: const Text('Invalid input'),
+                content: const Text(
+                    'Please make sure a valid title, amount, date and category was entered.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                    },
+                    child: const Text('Okay'),
+                  ),
+                ],
+              ));
+    } else {
+      // Normal dialog box (Android Device)
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -63,6 +72,23 @@ class _NewExpenseState extends State<NewExpense> {
           ],
         ),
       );
+    }
+  }
+
+  void _submitExpenseData() {
+    // double.tryParse() built-in method in Dart, takes Strings a an input and return Double if able to convert or if not then return null
+// for exmp. tryParse('Hello') => null, tryParse('1.12') => 1.12
+    final enteredAmount = double.tryParse(_amountController
+        .text); // tryParse('Hello') => null, tryParse('1.12') => 1.12
+    // Comparison amount booleean value to to check both null or less than 0
+    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+    // trim() built-in method simply remove white space at the begining or end, trim can be call on strings
+    // isEmpty is a buit-in property, isEmpty call as List of Strings
+
+    if (_titleController.text.trim().isEmpty ||
+        amountIsInvalid ||
+        _selectedDate == null) {
+      _showDialog();
       return;
     }
 
